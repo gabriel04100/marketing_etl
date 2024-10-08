@@ -2,17 +2,8 @@ from pymongo import MongoClient, errors
 import os
 from dotenv import load_dotenv
 import logging
+import json
 
-
-logging.basicConfig(filename="./insert_batch.log")
-
-# Get the directory of the current script
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Load environment variables from .env file located in the same directory
-load_dotenv(os.path.join(script_dir, '.env'))
-
-MONGO_URL = os.getenv("MONGO_URL")
 
 
 def insert_documents__into_mongodb(data, MONGO_URL,db_name, collection_name):
@@ -45,9 +36,44 @@ def insert_documents__into_mongodb(data, MONGO_URL,db_name, collection_name):
         logging.info("MongoDB connection closed.")
 
 
-def insert_items_batch(data):
+def insert_items_batch(data_batch, MONGO_URL, db_name):
     #users transactions  product_reviews  products
-    users = data["users"]
-    transactions = data["transactions"]
-    product_review = data["product_reviews"]
-    products = data["products"]
+    db_collections = {"users":data_batch.get("users"),
+                      "transactions":data_batch.get("transactions"),
+                      "product_reviews":data_batch.get("product_reviews"),
+                      "products":data_batch.get("products")}
+
+    for collection_key in db_collections.keys():
+        insert_documents__into_mongodb(data=db_collections[collection_key],
+                                       MONGO_URL=MONGO_URL,
+                                       db_name=db_name,
+                                       collection_name=collection_key)
+
+
+
+
+logging.basicConfig(filename="./insert_batch.log")
+
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Load environment variables from .env file located in the same directory
+load_dotenv(os.path.join(script_dir, '.env'))
+
+MONGO_URL = os.getenv("MONGO_URL")
+db_name="product_transactions"
+
+with open("./data/initial_batch_products.json") as json_batch:
+    batch = json.load(json_batch)
+
+print(batch)
+
+try:
+    insert_items_batch(batch, MONGO_URL=MONGO_URL, db_name=db_name)
+
+except Exception as e:
+    print("error trying to insert files")
+
+
+    
+
