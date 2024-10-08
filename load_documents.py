@@ -52,7 +52,7 @@ def insert_items_batch(data_batch, MONGO_URL, db_name):
 
 
 
-logging.basicConfig(filename="./insert_batch.log")
+logging.basicConfig(filename="./logs/insert_batch.log")
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
