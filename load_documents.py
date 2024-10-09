@@ -52,7 +52,12 @@ def insert_items_batch(data_batch, MONGO_URL, db_name):
 
 
 
-logging.basicConfig(filename="./logs/insert_batch.log")
+
+
+logging.basicConfig(filename="./logs/insert_batch.log",
+                        level=logging.DEBUG,
+                        format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 # Get the directory of the current script
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,6 +75,7 @@ print(batch)
 
 try:
     insert_items_batch(batch, MONGO_URL=MONGO_URL, db_name=db_name)
+    logging.info("batch succesfly inserted")
 
 except Exception as e:
     print("error trying to insert files")
